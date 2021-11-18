@@ -1,0 +1,24 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+import pylab as pl
+import numpy as np
+%matplotlib inline
+from sklearn.preprocessing import PolynomialFeatures
+df=pd.read_csv('games.csv')
+df.head()
+df.shape
+cdf=df.drop([	'last_move_at',	'turns'	,'victory_status',	'winner'	,'increment_code'			,'moves'	,'opening_eco','id',	'rated',	'created_at'	,'white_id'],axis=1)
+cdf['power']=pd.Series(df.white_rating-df.black_rating,index=df.index)
+cdf['turns']=pd.DataFrame(df.turns,index=cdf.index)
+from sklearn.linear_model import LinearRegression
+msk = np.random.rand(len(df)) < 0.8
+train = cdf[msk]
+test = cdf[~msk]
+trainx=np.asanyarray(cdf[['power','turns']])
+trainy=np.asanyarray(cdf.opening_ply)
+rgr=linear_model.LinearRegression()
+print(cdf)
+rgr.fit(trainx,trainy)
+t=rgr.predict(test[['power','turns']])
+data=np.array(t)
+dataset = pd.DataFrame({'Column1': data[ :3]})
