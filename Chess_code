@@ -1,24 +1,30 @@
-import matplotlib.pyplot as plt
 import pandas as pd
-import pylab as pl
 import numpy as np
-%matplotlib inline
-from sklearn.preprocessing import PolynomialFeatures
-df=pd.read_csv('games.csv')
-df.head()
-df.shape
-cdf=df.drop([	'last_move_at',	'turns'	,'victory_status',	'winner'	,'increment_code'			,'moves'	,'opening_eco','id',	'rated',	'created_at'	,'white_id'],axis=1)
-cdf['power']=pd.Series(df.white_rating-df.black_rating,index=df.index)
-cdf['turns']=pd.DataFrame(df.turns,index=cdf.index)
 from sklearn.linear_model import LinearRegression
-msk = np.random.rand(len(df)) < 0.8
-train = cdf[msk]
-test = cdf[~msk]
-trainx=np.asanyarray(cdf[['power','turns']])
-trainy=np.asanyarray(cdf.opening_ply)
-rgr=linear_model.LinearRegression()
-print(cdf)
-rgr.fit(trainx,trainy)
-t=rgr.predict(test[['power','turns']])
-data=np.array(t)
-dataset = pd.DataFrame({'Column1': data[ :3]})
+
+
+# reading the data
+all_data = pd.read_csv('games.csv')
+# summary of data
+print('summary of data:', all_data.head())
+print('shape of data:', all_data.shape)
+# we are taking some relevant columns
+training_data = all_data.drop(['last_move_at', 'turns', 'victory_status', 'winner', 'increment_code', 'moves',
+                               'opening_eco', 'id', 'rated', 'created_at', 'white_id'], axis=1)
+# power is rank difference between gamers
+training_data['power'] = pd.Series(all_data.white_rating - all_data.black_rating, index=all_data.index)
+training_data['turns'] = pd.DataFrame(all_data.turns, index=training_data.index)
+# splitting the data randomly
+msk = np.random.rand(len(all_data)) < 0.8
+train = training_data[msk]
+test = training_data[~msk]
+# i trained the model with two necessary columns
+train_x = train[['power', 'turns']].copy()
+train_y = train['opening_ply'].copy()
+# training the model
+model = LinearRegression()
+print(training_data.tail())
+model.fit(train_x, train_y)
+# taking the results
+predictions = model.predict(test[['power', 'turns']])
+results = pd.DataFrame({'predictions': predictions})
